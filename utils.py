@@ -31,7 +31,7 @@ import sys
 
 base_dir = os.getcwd()
 data_dir = os.path.join("/share/magpie/datasets/Swedish")	# Where the XMLs are
-dir_out = os.path.join(base_dir,"Finnish/temp_txt") # Where temp txt will ouput
+dir_out = os.path.join(base_dir,"/data/Finnish/temp_txt") # Where temp txt will ouput
 code_dir = base_dir
 earliest_time = 1740
 

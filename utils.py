@@ -21,6 +21,8 @@ from collections import defaultdict
 import itertools
 import re
 import cProfile, pstats, io
+from collections import Counter
+import pickle
 
 NUM_CORES = multiprocessing.cpu_count()
 
@@ -31,7 +33,7 @@ import sys
 
 base_dir = os.getcwd()
 data_dir = os.path.join("/share/magpie/datasets/Swedish")	# Where the XMLs are
-dir_out = os.path.join(base_dir,"/data/Finnish/temp_txt") # Where temp txt will ouput
+dir_out = os.path.join(base_dir,"data/Finnish/temp_txt") # Where temp txt will ouput
 code_dir = base_dir
 earliest_time = 1740
 
@@ -41,6 +43,79 @@ print("base dir is",base_dir)
 print("data dir is",data_dir)
 print("output dir is",dir_out)
 print("earliest_time is",earliest_time)
+
+
+class LanguageCounter():
+    def __init__(self, dataPath):
+        self.dataPath = dataPath
+        self.allCounters = {}
+        self.commonWords = {}
+        
+        self.topWordsTotal = None
+        self.allFeatized = None
+        
+        #buildCommonCounters(self.datapath)
+        #buildFeatures()
+    
+    """
+        For every pickle file in dataPath, adds a counter for each decade to self.allCounters
+    """
+    def buildCommonCounters(self, dataPath):
+        # commonWords = []
+        # allCounters = {d: Counter() for d in decades}
+        # TODO: re-run for finnish 1771 bc im dumb
+        for f in os.listdir(dataPath):
+            if(f.endswith(".pickle")):
+                decade = os.path.basename(f)
+                decade = decade[decade.index("1"): decade.index("1")+3] + "0"
+                if decade not in list(self.allCounters.keys()):
+                    print("adding decade", decade)
+                    self.allCounters[decade] = Counter()
+                    self.commonWords[decade] = set([])
+
+                with open(os.path.join(dataPath, f), 'rb') as f:
+                    wordCounter = pickle.load(f)
+
+                self.allCounters[decade] += wordCounter
+                top100 = [w[0] for w in wordCounter.most_common(100)]
+                # Build a list of the top 100 across all files of a decade
+                # Mainly helps get an idea over anything quantitative
+                self.commonWords[decade].update(top100)
+    
+    def getOverlaps(self):
+        overlaps = []
+        simToBase = [100]
+        base = list(self.commonWords.keys())[0]
+        for i in range(len(self.commonWords)-1):
+            decade = list(self.commonWords.keys())[i]
+            decade_n = list(self.commonWords.keys())[i+1]
+            overlaps += [len(set(self.commonWords[decade]).intersection(self.commonWords[decade_n]))]
+            simToBase += [len(set(self.commonWords[decade_n]).intersection(self.commonWords[base]))]
+        # overlapBounds = len(set(self.commonWords[0]).intersection(self.commonWords[-1]))
+        return overlaps, simToBase
+    
+    def buildFeatures(self):
+        totalFreqs = sum(self.allCounters.values(), Counter())
+        totalFreqsSorted = totalFreqs.most_common()
+        self.topWordsCounter = totalFreqs.most_common(250)
+        
+        self.topWordsTotal = []
+        i = 0
+        while len(self.topWordsTotal) < 250: 
+            word = totalFreqsSorted[i]
+            inText = [1 if word[0] in list(self.allCounters.values())[j] else 0 for j in range(len(self.allCounters))]
+            proport = sum(inText) / len(inText)
+            print("word ", word, "in % of texts: ", proport)
+            if proport >= 0.5: 
+                self.topWordsTotal += [word[0]]
+            i += 1
+            
+        self.allFeatize = []
+        for counter in list(self.allCounters.values()):
+            lenDoc = sum(counter.values())
+            featize = np.array([counter[self.topWordsTotal[i]] for i in range(len(self.topWordsTotal))])
+            featize = np.divide(featize, lenDoc)
+            self.allFeatize += [featize]
 
 
 if os.path.exists(dir_out) == False:

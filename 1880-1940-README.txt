@@ -1,0 +1,101 @@
+The Newspaper and Periodical Corpus of the National Library of
+Finland, Swedish sub-corpus, 1880–1948, scrambled, VRT
+
+Persistent identifier: http://urn.fi/urn:nbn:fi:lb-2020110302
+Licence: CC BY 4.0, https://creativecommons.org/licenses/by/4.0/
+IPR holder: The National Library of Finland
+Short name: klk-sv-1880-1948-s-vrt
+
+
+Description
+
+The corpus contains the years 1880–1948 of the Swedish sub-corpus of
+the Newspaper and Periodical Corpus of the National Library of Finland
+in the VRT (VeRticalized Text) format. The data has been digitized by
+the National Library of Finland and converted to the VRT format and
+annotated by FIN-CLARIN. The sentences within each page have been
+scrambled to a random order for copyright reasons.
+
+For some more information, please see the corpus metadata record at
+http://urn.fi/urn:nbn:fi:lb-2020110302
+
+The data has been annotated with an old version of Språkbanken’s Korp
+corpus pipeline, with text-level metadata from the original data.
+
+Please note that the text data has been programmatically recognized
+from page images (OCR’d) and annotated without any manual correction,
+so its quality varies significantly.
+
+The data for each year is in a single file, named klk-sv-YYYY-s.vrt.
+
+The data is encoded in UTF-8, with Unix-style line endings (LF). The
+literal characters &, < and > have been encoded as the XML predefined
+entities &amp;, &lt; and &gt;, and in structural attribute annotations
+also " as &quot;.
+
+Each token is on a line of its own, with the token and its annotation
+attributes (positional attributes) separated by tabs. The attributes
+are the following (in this order, also listed in the
+“#vrt positional-attributes” comment at the beginning of the file):
+
+  word: word form
+  pos: part-of-speech tag
+  msd: morpho-syntactic description
+  lemma: base form(s)
+  lex: lemgram(s) (lemma + part-of-speech code)
+  saldo: lemma(s) with sense information
+  prefix: prefix lemgram(s)
+  suffix: suffix lemgram(s)
+  ref: the number of the token in the sentence
+  dephead: the number of the dependency head of the token
+  deprel: dependency relation
+  ocr: OCR confidence for the token (0.01…1.00)
+  style: “_” (normal text), “subscript” or “superscript”
+
+The attributes lemma, lex, saldo, prefix and suffix are feature-set
+(multi-valued) attributes, in which the different values are separated
+by vertical bars (|), with a leading and trailing vertical bar. A lone
+vertical bar denotes the empty set (no value).
+
+Structural divisions are marked with XML-style tags, with annotations
+associated with each structure as attributes in the start tag. The
+order of the annotation attributes may vary. The structures and their
+annotation attributes are:
+
+  text: A single page of a newspaper or magazine
+    binding_id: issue identifier used for linking to page images at
+        the National Library of Finland
+    datefrom: the first date of the date range covering the issue date
+        (yyyymmdd): if issue date is a year, “yyyy0101”, if a month,
+        “yyyymm01”
+    dateto: the last date of the date range covering the issue date
+        (yyyymmdd): e.g., if issue data is a year, “yyyy1231”
+    elec_date: digitization date (yyyy-mm-dd)
+    file: original single-page VRT file name
+    img_url: template for page image file name
+    issue_date: date of the issue in the format [[dd.]mm.]yyyy
+    issue_no: number of the issue
+    issue_title: title of the issue
+    label: name of the publication, issue number and date
+    language: two-letter ISO 639-1 language code
+    page_id: page identifier
+    page_no: page number
+    part_name: name of the part of publication (seldom used)
+    publ_id: publication identifier: either ISSN or “fk” + number for
+        publications without an ISSN
+    publ_part: part of publication (number) (seldom used)
+    publ_title: name of the publication
+    publ_type: type of publication: “sanomalehti” for a newspaper,
+        “aikakausi” for a periodical
+    sentcount: number of sentences on the page
+    timefrom: always “000000” (time information at day granularity)
+    timeto: always “235959”
+    tokencount: number of tokens on the page
+
+  sentence: A sentence
+    id: unique identifier of the sentence
+
+Note that sentences broken by page breaks have not been concatenated.
+
+The data also contains some singe-line XML-style comments <!-- ... -->
+at the beginning and end of each file.

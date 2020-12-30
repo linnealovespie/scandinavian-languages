@@ -23,6 +23,7 @@ import re
 import cProfile, pstats, io
 from collections import Counter
 import pickle
+import numpy as np
 
 NUM_CORES = multiprocessing.cpu_count()
 
@@ -46,9 +47,34 @@ print("earliest_time is",earliest_time)
 
 
 class LanguageCounter():
+    """ Class used to represent each corpus. 
+    ...
+    Attributes
+    ----------
+    dataPath: str
+        Path to the directory that contains the pickled raw text for each newspaper. 
+    allCounters: Dict[np.datetime64, Counter]
+        A mapping from decade to a counter of each word in the newspaper publishings for that decade. 
+    commonWords: Dict[np.datetime64, list[str]]
+        A mapping from decade to the top 100 most commonly used words used in that decade. 
+    topWordsTotal: Counter
+        The top 250 words used across all time by the newspapers and their overall frequncies. 
+    allFeatized: List[List[float]]
+        A list of 250-dimensional vectors, one for each decade of the corpus. Vectors show the frequencies of each of the topWordsTotal within that decade.
+    
+    Methods
+    -------
+    buildCommonCounters(dataPath)
+        For every pickle file in dataPath, adds a counter for the given decade to self.allCounters
+    getOverlaps()
+        Get the amount of word overlap across decades. 
+    buildFeatures()
+        Builds feature vectors that describe each decade by the frequency of each of the overall top 250 most commonly used words by the language. 
+    """
+    
     def __init__(self, dataPath):
         self.dataPath = dataPath
-        self.allCounters = {}
+        self.allCounters = {} 
         self.commonWords = {}
         
         self.topWordsTotal = None
@@ -68,8 +94,9 @@ class LanguageCounter():
             if(f.endswith(".pickle")):
                 decade = os.path.basename(f)
                 decade = decade[decade.index("1"): decade.index("1")+3] + "0"
+                decade = np.datetime64(decade, 'Y')
                 if decade not in list(self.allCounters.keys()):
-                    print("adding decade", decade)
+                    # print("adding decade", decade)
                     self.allCounters[decade] = Counter()
                     self.commonWords[decade] = set([])
 
@@ -81,16 +108,19 @@ class LanguageCounter():
                 # Build a list of the top 100 across all files of a decade
                 # Mainly helps get an idea over anything quantitative
                 self.commonWords[decade].update(top100)
+        self.allCounters = {k: self.allCounters[k] for k in sorted(self.allCounters)}
+        self.commonWords = {k: self.commonWords[k] for k in sorted(self.commonWords)}
     
     def getOverlaps(self):
         overlaps = []
-        simToBase = [100]
+        simToBase = [1]
         base = list(self.commonWords.keys())[0]
         for i in range(len(self.commonWords)-1):
             decade = list(self.commonWords.keys())[i]
             decade_n = list(self.commonWords.keys())[i+1]
             overlaps += [len(set(self.commonWords[decade]).intersection(self.commonWords[decade_n]))]
-            simToBase += [len(set(self.commonWords[decade_n]).intersection(self.commonWords[base]))]
+            simToBase += [len(set(self.commonWords[decade_n]).intersection(self.commonWords[base]))
+                         / len(self.commonWords[decade_n].union(self.commonWords[base]))]
         # overlapBounds = len(set(self.commonWords[0]).intersection(self.commonWords[-1]))
         return overlaps, simToBase
     

@@ -1,3 +1,8 @@
+"""
+    Once the raw text files have been generated with `utils.py`, these helper functions create
+    word Counters for each decade and saves them as pickled files for easy re-use. 
+"""
+
 import utils
 import xml.etree.cElementTree  as ET
 import os
@@ -56,13 +61,4 @@ def buildCounterSwedish(data_dir=xmlPath, dir_out=swedishOutputPath):
 if __name__ == "__main__":
     
     buildCounterSwedish()
-    """for file in os.listdir(earlyPath):
-        if file.endswith(".vrt"):
-            print("Building counter for: ", file)
-            buildCounter(os.path.join(earlyPath, file))
-            
-    for file in os.listdir(latePath):
-        if file.endswith(".vrt"):
-            print("Building counter for: ", file)
-            buildCounter(os.path.join(earlyPath, file))"""
             

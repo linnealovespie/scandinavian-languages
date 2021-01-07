@@ -1,7 +1,9 @@
-## Simon Hengchen
-# hengchen.net
-
-### IMPORTS
+"""
+    Script for converting Swedish XML and Finnish VRT (a custom XML format) data into pickled files that contain raw word 
+    usage over time. 
+    
+    Builds upon Simon Hengchen's script, hengchen.net. 
+"""
 
 from multiprocessing import Pool 
 import os
@@ -33,7 +35,7 @@ import sys
 
 
 base_dir = os.getcwd()
-data_dir = os.path.join("/share/magpie/datasets/Swedish")	# Where the XMLs are
+data_dir = os.path.join("/share/magpie/datasets/Swedish")# Where the XMLs are
 dir_out = os.path.join(base_dir,"data/Finnish/temp_txt") # Where temp txt will ouput
 code_dir = base_dir
 earliest_time = 1740
@@ -84,9 +86,6 @@ class LanguageCounter():
         """
         For every pickle file in dataPath, adds a counter for each decade to self.allCounters.
         """
-        # commonWords = []
-        # allCounters = {d: Counter() for d in decades}
-        # TODO: re-run for finnish 1771 bc im dumb
         for f in os.listdir(dataPath):
             if(f.endswith(".pickle")):
                 decade = os.path.basename(f)
@@ -109,6 +108,10 @@ class LanguageCounter():
         self.commonWords = {k: self.commonWords[k] for k in sorted(self.commonWords)}
     
     def getOverlaps(self):
+        """
+            Uses set unions to find the amount of overlap between each consecutive decade and the amount of overlap with 
+            the first decade. These values are returned as overlaps and simToBase respectively. 
+        """
         overlaps = []
         simToBase = [1]
         base = list(self.commonWords.keys())[0]
@@ -118,10 +121,13 @@ class LanguageCounter():
             overlaps += [len(set(self.commonWords[decade]).intersection(self.commonWords[decade_n]))]
             simToBase += [len(set(self.commonWords[decade_n]).intersection(self.commonWords[base]))
                          / len(self.commonWords[decade_n].union(self.commonWords[base]))]
-        # overlapBounds = len(set(self.commonWords[0]).intersection(self.commonWords[-1]))
         return overlaps, simToBase
     
     def buildFeatures(self):
+        """
+            For each decade, creates a 250-dimensional vector of frequencies of each of the 250 most-frequenly used
+            words across all decades. 
+        """
         totalFreqs = sum(self.allCounters.values(), Counter())
         totalFreqsSorted = totalFreqs.most_common()
         self.topWordsCounter = totalFreqs.most_common(250)

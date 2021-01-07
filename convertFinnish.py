@@ -40,17 +40,18 @@ def buildCounter(filePath):
         pickle.dump(count, f) 
         
 
-def buildCounterSwedish():
-    utils.data_dir = xmlPath
-    utils.dir_out = swedishOutputPath
-    for xml in os.listdir(xmlPath):
-        count = Counter()
-        print("Parsing Swedish to txt:", xml)
-        utils.parse_file_iter(xml, count)
-        print("finished counter: ", count.most_common(100))
-        
-        with open(os.path.join(swedishOutputPath, os.path.splitext(xml)[0] + ".pickle"), 'wb') as f:
-            pickle.dump(count, f)
+def buildCounterSwedish(data_dir=xmlPath, dir_out=swedishOutputPath):
+    utils.data_dir = data_dir
+    utils.dir_out = dir_out
+    for xml in os.listdir(data_dir):
+        if xml.endswith(".xml"):
+            count = Counter()
+            print("Parsing Swedish to txt:", xml)
+            utils.parse_file_iter(xml, count)
+            print("finished counter: ", count.most_common(100))
+
+            with open(os.path.join(dir_out, os.path.splitext(xml)[0] + ".pickle"), 'wb') as f:
+                pickle.dump(count, f)
         
 if __name__ == "__main__":
     

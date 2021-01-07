@@ -79,14 +79,11 @@ class LanguageCounter():
         
         self.topWordsTotal = None
         self.allFeatized = None
-        
-        #buildCommonCounters(self.datapath)
-        #buildFeatures()
     
-    """
-        For every pickle file in dataPath, adds a counter for each decade to self.allCounters
-    """
     def buildCommonCounters(self, dataPath):
+        """
+        For every pickle file in dataPath, adds a counter for each decade to self.allCounters.
+        """
         # commonWords = []
         # allCounters = {d: Counter() for d in decades}
         # TODO: re-run for finnish 1771 bc im dumb
